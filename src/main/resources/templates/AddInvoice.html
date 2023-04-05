@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="ISO-8859-1">
+	<meta name="viewport" content="width=device-width , initial-scale=1">
+	
+	<link href="#" class="shortcut icon" >
+	<script	src="https://code.jquery.com/jquery-3.6.1.js"></script>
+	
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+	
+	<script src="https://kit.fontawesome.com/a076d05399.js" ></script>
+ 	
+<title>Add Invoice</title>
+
+<script>
+	
+	$(document).ready(function(){
+		
+			let cnt=1;
+		
+			$('#unit_price').focusout(function(){
+				
+					let gst = (18/100)+1;
+					
+					let res = $(this).val() / gst;
+					
+					$(this).val(res);
+			});
+		
+		$('#sbm').click(function(e){
+			
+			if($('#maharashtra').prop("checked"))
+			{
+				$('#maharashtra').val('mh');
+				$('#other').val('');
+			}	
+			if($('#other').prop("checked"))
+			{
+				$('#other').val('ot');
+				$('#maharashtra').val('');
+			}
+		});
+	});
+
+</script>
+
+</head>
+   <body>
+
+		<div th:replace="fragments/Header.html :: header">
+		</div>	
+		
+		<div class="container" style="margin-top:80px;">
+			
+			<div class="card">
+			
+			<div class="card-header">
+				<h4>Add Invoice</h4>
+			</div>
+			
+			<div class="card-body">
+			<form th:action="@{/savetempinvoice}" method="POST">
+			 	
+			 	<div class="form-group">
+			 	  <label for="prod_id">Product</label>
+			 		<select id="prod_id" name="prod_id" class="form-control mb-3">
+			 			<option selected>Please Select Any Product</option>
+			 			<th:block th:each="pli : ${plist}">
+			 				
+			 				<option th:value="${pli.prod_id}" th:text="${pli.prod_name}" />
+			 			
+			 			</th:block>
+			 		
+			 		</select>
+			 	</div>
+			 	
+			 	<div class="form-group">
+			 		<label for="unit_price">Custom Basic Price</label>
+			 			<input type="text" id="unit_price" name="unit_price" placeholder="Enter the Price of the Product" class="form-control mb-3" required/>
+			 	</div>
+			 	
+			 	<div class="form-group">
+			 		<label for="qty">Quantity</label>
+			 			<input type="number" id="qty" name="qty" placeholder="Enter the Quantity" class="form-control mb-3" required/>
+			 	</div>
+			 	
+			 	<label>Select State</label><br>
+				 	<div class="form-check mb-1">
+					      <input type="radio" class="form-check-input" id="maharashtra" name="stoption" value="mh" checked>
+					      	<label class="form-check-label" for="maharashtra">Maharashtra</label>
+					</div>
+					
+					<div class="form-check  mb-1">
+					      <input type="radio" class="form-check-input" id="other" name="stoption" value="ot">
+					        <label class="form-check-label" for="other">Other</label>
+				    </div>
+			 				 	
+			 	<input type="submit" id="sbm" value="Add Invoice" class="btn btn-primary">		
+			 	 	
+			</form>
+			<hr class="mt-3">
+			
+			
+			<div class="col-sm-12">
+				 <div class="card-header">
+				 	<strong>Invoice Product List </strong>
+				 </div>
+			<table class="table table-striped table-bordered" id="sample1" >
+				<thead>
+					<tr>
+						<td>Sr.no</td>
+						<td>Product Name</td>
+						<td>HSN</td>
+						<td>Price</td>
+						<td>Quantity</td>
+						<td>CGST</td>
+						<td>SGST</td>
+						<td>IGST</td>
+						<td>Total</td>
+						<td>Action</td>
+					</tr>
+				</thead>
+				
+				<tbody>
+				
+				<th:block th:if="${tilist} !=null">
+				  <th:block th:each=" tin  :${tilist} ">
+					<tr>
+ 					   <td th:text="${tinStat.count}"></td>
+ 					   <td th:text="${tin.prod_name}"></td>
+ 					   <td th:text="${tin.prod_hsn}"></td>
+ 					   <td th:text="${tin.unit_price}"></td>
+ 					   <td th:text="${tin.qty}"></td>
+ 					   <td th:text=" | ${tin.cgst} (${tin.cgst_per}%) |"></td>
+ 					   <td th:text=" | ${tin.sgst} (${tin.sgst_per}%) |"></td>
+ 					   <td th:text=" | ${tin.igst} (${tin.igst_per}%) |"></td>
+ 					   <td th:text="${tin.total}"></td>
+ 					   <td ><a href="javascript:void(0);" th:onclick="removeitem([[${tin.temp_id}]])" ><i class="fa fa-times fa-2X"></i></a></td>
+ 					   
+					</tr>
+				   </th:block>
+				 </th:block>
+				 
+				 <th:block th:unless="${tilist} !=null">
+					<tr>
+ 					   <span >No records to Show</span>
+ 					</tr>
+				 </th:block>
+				 
+				</tbody>
+				
+			</table>
+			</div>
+			
+			<form th:action="@{saveinvoice}" method="POST">
+			
+				<div class="form-group">
+			 	  <label for="customer_id">Customer</label>
+			 		<select id="customer_id" name="customer_id" class="form-control mb-3">
+			 			<option selected>Please Select Customer</option>
+			 			<th:block th:each="cli : ${clist}">
+			 				
+			 				<option th:value="${cli.cust_id}" th:text="|${cli.cust_first_name} ${cli.cust_last_name} |" />
+			 			
+			 			</th:block>
+			 		
+			 		</select>
+			 	</div>
+			
+				<div class="form-group">
+				 		<label for="vehicle">Vehicle Number</label>
+				 			<input type="text" id="vehicle" name="vehicle" placeholder="Enter the Vehicle No." class="form-control mb-3" />
+				</div>
+				
+				<div class="form-group">
+				 		<label for="orderponumber">Order PO Number</label>
+				 			<input type="text" id="orderponumber" name="orderponumber" placeholder="PO Number" class="form-control mb-3" />
+				</div>
+				
+				<div class="form-group">
+				 		<label for="batch_no">Batch Number</label>
+				 			<input type="text" id="batch_no" name="batch_no" placeholder="Enter the Batch Number" class="form-control mb-3" />
+				</div>
+				
+				<input type="submit" id="sbm" value="Save Invoice" class="btn btn-primary">		
+			
+			</form>
+			
+		   </div>
+		 </div>
+	  </div>
+  
+  		<div th:replace="fragments/Footer.html :: footer">
+		</div>
+  </body>
+  
+  
+<!--  <script th:src="@{/js/addinvoice.js}"> -->
+  	<script>
+  	function removeitem(id)
+  	{
+  		alert("Selected temp Id is -> "+id);
+  		if (window.confirm("Do you really want to Delete?")) 
+  		{ 
+	  		$.ajax({
+	  			
+	 			url	: '/removeitem/'+id,
+	 			type : 'GET',
+	 			success: function(result)
+	 			{
+	 				location.reload();
+	 			}
+	  		});
+  		}
+  		else{
+  			location.reload();
+  		}
+  	}
+  </script>
+  
+</html>
