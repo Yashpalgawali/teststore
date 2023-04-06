@@ -12,7 +12,7 @@
 	
 	<script src="https://kit.fontawesome.com/a076d05399.js" ></script>
  	
-<title>Add Invoice</title>
+<title>Edit Invoice</title>
 
 <script>
 	
@@ -61,7 +61,7 @@
 			</div>
 			
 			<div class="card-body">
-			<form th:action="@{/savetempinvoice}" method="POST">
+			<form th:action="@{/updatetempinvoice}" method="POST">
 			 	
 			 	<div class="form-group">
 			 	  <label for="prod_id">Product</label>
@@ -137,7 +137,7 @@
  					   <td th:text=" | ${tin.sgst} (${tin.sgst_per}%) |"></td>
  					   <td th:text=" | ${tin.igst} (${tin.igst_per}%) |"></td>
  					   <td th:text="${tin.total}"></td>
- 					   <td><a href="javascript:void(0);" th:onclick="removeitem([[${tin.temp_id}]])" ><i class="fa fa-times fa-2X"></i></a></td>
+ 					   <td><a href="javascript:void(0);" th:onclick="removeitem([[__${tin.temp_id}__]])" ><i class="fa fa-times fa-2X"></i></a></td>
  					</tr>
 				   </th:block>
 				 </th:block>

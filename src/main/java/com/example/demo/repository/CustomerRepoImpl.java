@@ -76,7 +76,7 @@ public class CustomerRepoImpl implements CustomerRepo {
 	@Override
 	public Customer getCustomerById(String cid) {
 		// TODO Auto-generated method stub
-		return temp.queryForObject("select * from tbl_customer", new BeanPropertyRowMapper<Customer>(Customer.class));
+		return temp.queryForObject("select * from tbl_customer WHERE cust_id='"+cid+"'", new BeanPropertyRowMapper<Customer>(Customer.class));
 	}
 
 	@Override

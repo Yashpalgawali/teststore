@@ -10,7 +10,4 @@ public class TeststorenojpaApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(TeststorenojpaApplication.class, args);
 	}
-	
-	 
 }
-  

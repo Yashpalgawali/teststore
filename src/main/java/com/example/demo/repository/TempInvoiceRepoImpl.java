@@ -75,9 +75,9 @@ public class TempInvoiceRepoImpl implements TempInvoiceRepository {
 				temp.setTotal(rs.getFloat(10));
 				temp.setUnit(rs.getString(11));
 				temp.setVat_per(rs.getFloat(12));
-				temp.setUnit_price(rs.getFloat(13));
-				
+				temp.setProd_id(rs.getInt(13));
 				temp.setUnit_price(rs.getFloat(14));
+								
 				temp.setProd_id(rs.getInt(15));
 				temp.setProd_name(rs.getString(16));
 				temp.setProd_hsn(rs.getLong(17));

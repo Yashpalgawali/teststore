@@ -137,9 +137,7 @@
 			      		</tr>	
 			      	
 					</th:block>
-<!-- 					<th:block th:each=""> -->
-<!-- 							<tr style="height:25px"><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr> -->
-<!-- 					</th:block> -->
+
 						
 					<tr style="border-top:1px solid #999;border-bottom:1px solid #999">
 							<td colspan="2" style="font-size:12px;padding:5px;text-align:right"><b>Total Qty:</b></td>
@@ -151,7 +149,7 @@
 					<th:block th:if="${tsgst}!=null">
 						<th:block th:if="${tsgst} >0.0">
 						 <tr>
-						 	<td colspan='9' style="font-size:12px;padding:5px;text-align:right"><b>CGST     %</b></td>
+						 	<td colspan='9' style="font-size:12px;padding:5px;text-align:right"><b>CGST [[${cgstper}]]%</b></td>
 							<td style="font-size:12px;padding:5px;text-align:right"><b>[[${tcgst}]]</b></td>
 						</tr>
 						</th:block>
@@ -160,7 +158,7 @@
 					<th:block th:if="${tcgst}!=null">
 						<th:block th:if="${tcgst} >0.0">
 							 <tr>
-							 	<td colspan='9' style="font-size:12px;padding:5px;text-align:right"><b>SGST     %</b></td>
+							 	<td colspan='9' style="font-size:12px;padding:5px;text-align:right"><b>SGST [[${cgstper}]]%</b></td>
 								<td style="font-size:12px;padding:5px;text-align:right"><b>[[${tcgst}]]</b></td>
 							</tr>
 						</th:block>
@@ -169,8 +167,8 @@
 					<th:block th:if="${totctgst}!=null">
 					   <th:block th:if="${totctgst}>0.0">
 						 <tr>
-						 	<td colspan='9' style="font-size:12px;padding:5px;text-align:right"><b>IGST     %</b></td>
-							<td style="font-size:12px;padding:5px;text-align:right"><b>[[${totctgst}]]</b></td>
+						 	<td colspan='9' style="font-size:12px;padding:5px;text-align:right"><b>IGST [[${igstper}]]%</b></td>
+							<td style="font-size:12px;padding:5px;text-align:right"><b>[[${#numbers.formatDecimal(__${totctgst}__,3,2,'POINT')}]]</b></td>
 						</tr>
 						</th:block>
 					</th:block>

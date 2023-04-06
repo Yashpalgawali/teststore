@@ -35,6 +35,15 @@ public class ProductServImpl implements ProductService {
 	@Override
 	public int updateProduct(Product prod) {
 		// TODO Auto-generated method stub
+		
+		float cgst_per = prod.getGsttax()/2;
+		float sgst_per = prod.getGsttax()/2;
+		float igst_per = prod.getGsttax();
+		
+		prod.setCgst_per(cgst_per);
+		prod.setSgst_per(sgst_per);
+		prod.setIgst_per(igst_per);
+		
 		return prodrepo.updateProduct(prod);
 	}
 

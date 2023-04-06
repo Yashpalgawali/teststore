@@ -1,8 +1,10 @@
 package com.example.demo.controller;
 
 import java.sql.Date;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpSession;
 
@@ -42,9 +44,53 @@ public class InvoiceController {
 	@Autowired
 	CustomerService custserv; 
 	
+	@Autowired
+	InvoiceProductService invprodserv;
+	
+	@Autowired
+	InvoiceService invserv;
+	
+		
 	@GetMapping("/addinvoice")
 	public String addInvoice(Model model,HttpSession sess)
 	{
+		
+		float num = 132.456f,num2;
+		
+		String str = ""+num,str2="",str1="",fstr="",nstr="";
+		
+		str1 = str.substring(0,str.indexOf('.'));
+		
+		str2 = str.substring(str.indexOf('.'));
+		
+		fstr = str2.substring(1,3);
+		
+		nstr = (str1+"."+fstr);
+		
+		System.err.println("converted to String -->> "+str1+"\n String2 --> "+fstr+"\n After appending the result -->> "+Float.valueOf(nstr) );
+		
+//		char[] ch = str.toCharArray();
+//		int j=0;
+//		for(int i=0;i<ch.length;i++)
+//		{
+//			if(Character.isDigit(ch[i]))
+//			{
+//				if(j>0)
+//				{
+//					num = Character.getNumericValue(ch[i]);
+//				}
+//				else
+//				{
+//					str1.append(ch[i]);
+//				}
+//			}
+//			else
+//			{
+//				j=i;
+//			}
+//			
+//		}
+				
 		List<Temp_invoice> tilist = null;
 		
 		List<Product> plist= prodserv.getAllProducts();
@@ -138,9 +184,9 @@ public class InvoiceController {
 			teinv.setSgst_per( tem.getSgst_per());
 			teinv.setIgst(0);
 			
-			cgst = Math.round((sub_tot/100) * tem.getCgst_per());
-			sgst = Math.round((sub_tot/100) * tem.getSgst_per());
-			igst = Math.round((sub_tot/100) * teinv.getIgst_per());
+			cgst = (sub_tot/100) * tem.getCgst_per();
+			sgst =(sub_tot/100) * tem.getSgst_per();
+			igst = (sub_tot/100) * teinv.getIgst_per();
 		
 		}
 		else
@@ -149,14 +195,24 @@ public class InvoiceController {
 			teinv.setCgst_per(0);
 			teinv.setSgst_per(0);
 			
-			cgst = Math.round((sub_tot/100) * teinv.getCgst_per());
-			sgst = Math.round((sub_tot/100) * teinv.getSgst_per());
-			igst = Math.round((sub_tot/100) * tem.getIgst_per());
+			cgst = (sub_tot/100) * teinv.getCgst_per();
+			sgst = (sub_tot/100) * teinv.getSgst_per();
+			igst = (sub_tot/100) * tem.getIgst_per();
 		}
 		
 		String sid = (String) sess.getAttribute("temp_id");
 		
 		Integer tid = Integer.parseInt(sid);
+		
+		if(cgst!=0) {
+			
+			cgst = this.formatNumbers(cgst);
+			sgst = this.formatNumbers(sgst);
+		}
+		if(igst!=0) {
+			igst = this.formatNumbers(igst);
+		}
+		
 		
 		teinv.setTemp_invoice_id(tid);
 		teinv.setCgst(cgst);
@@ -165,15 +221,34 @@ public class InvoiceController {
 		
 		teinv.setUnit(tem.getProd_unit());
 		
-		teinv.setTotal(sub_tot+cgst+sgst+igst);
+		teinv.setTotal(Math.round(sub_tot+cgst+sgst+igst));
 		
-		System.err.println("Temp_invoice_id -> "+teinv.getTemp_invoice_id()+"\nProduct Id->"+teinv.getProd_id());
+		//System.err.println("Temp_invoice_id -> "+teinv.getTemp_invoice_id()+"\nProduct Id->"+teinv.getProd_id());
 		
 		tempinvserv.saveTempInvoice(teinv);
 		
 		return "redirect:/addinvoice";
 	}	
 	
+	
+	public float formatNumbers(float num)
+	{
+		System.err.println("Inside formatNumbers method NUmber is ->> "+num);
+		
+		String str = ""+num,str2="",str1="",fstr="",nstr="";
+		
+		str1 = str.substring(0,str.indexOf('.'));
+		
+		str2 = str.substring(str.indexOf('.'));
+		
+		fstr = str2.substring(1,3);
+		
+		nstr = (str1+"."+fstr);
+		
+		System.err.println("\n After converting to Float ->> "+Float.valueOf(nstr));
+		
+		return Float.valueOf(nstr);
+	}
 	
 	@RequestMapping("/removeitem/{id}")@ResponseBody
 	public boolean removeTemp_invoice(@PathVariable("id") String id)
@@ -189,13 +264,7 @@ public class InvoiceController {
 		}
 	}
 	
-	@Autowired
-	InvoiceProductService invprodserv;
-	
-	@Autowired
-	InvoiceService invserv;
-	
-	
+
 	@RequestMapping("/saveinvoice")
 	public String saveFinalInvoice(@ModelAttribute("Invoice")Invoice invoice, HttpSession sess, RedirectAttributes attr,Model model)
 	{
@@ -306,7 +375,7 @@ public class InvoiceController {
 	 	
 	 	List<Invoice_Product> invprodlist = invprodserv.getInvoiceProdListByOrderId(ordid);
 
-		Integer qtysum =0;
+		Integer qtysum =0,cgstper=0,sgstper=0,igstper=0;
 		Float   totsum = 0f,totstgst=0.0f,totctgst=0.0f,subtotalsum=0.0f,finaltotal=0.0f,tcgst=0.0f,tsgst=0.0f;
 		
 		for(int i=0;i<invprodlist.size();i++)
@@ -321,16 +390,22 @@ public class InvoiceController {
 				tcgst = tcgst + invprodlist.get(i).getCgst();
 				tsgst = tsgst + invprodlist.get(i).getSgst();
 				
+				cgstper = invprodlist.get(i).getCgst_per();
+				
 				totstgst = totstgst + invprodlist.get(i).getCgst() + invprodlist.get(i).getSgst();
 			}
 			else{
+				igstper =invprodlist.get(i).getIgst_per();
 				totctgst = totctgst + invprodlist.get(i).getIgst() ;
 			}
 		}
 		
 		finaltotal = subtotalsum+totstgst+totctgst;
 		
-		System.out.println("State gst ->> "+totstgst+"\n Central Cgst->> "+totctgst);
+		int ftotalval = 0;
+		
+		ftotalval = Math.round(finaltotal);
+		
 		
 	 	model.addAttribute("invoice", invoice);
 	 	model.addAttribute("invprodlist", invprodlist);
@@ -339,7 +414,9 @@ public class InvoiceController {
 	 	model.addAttribute("totstgst", totstgst);
 	 	model.addAttribute("totctgst", totctgst);
 	 	model.addAttribute("sbutotalsum", subtotalsum);
-	 	model.addAttribute("finaltotal", finaltotal);
+	 	model.addAttribute("finaltotal", ftotalval);
+	 	model.addAttribute("cgstper",cgstper);
+	 	model.addAttribute("igstper",igstper);
 	 	model.addAttribute("tsgst", tsgst);
 	 	model.addAttribute("tcgst", tcgst);
 	 	
@@ -374,6 +451,7 @@ public class InvoiceController {
 				model.addAttribute("tilist",  tilist);
 				model.addAttribute("invoice", invoice);
 				
+				
 				return "EditInvoice";
 			}
 			else
@@ -395,13 +473,15 @@ public class InvoiceController {
 		}
 	}
 	
-//	@RequestMapping("/updatetempinvoice")
-//	public String updateTempInvoice(@ModelAttribute("Temp_Invoice")Temp_Invoice teinv,HttpSession sess ,RedirectAttributes attr)
-//	{
-//		String sessid = (String) sess.getAttribute("temp_id");
-//		sess.getAttribute("temp_invoice_id");
-//		
-//		
+	@RequestMapping("/updatetempinvoice")@ResponseBody
+	public String updateTempInvoice(@ModelAttribute("Temp_Invoice")Temp_invoice teinv,HttpSession sess ,RedirectAttributes attr)
+	{
+		String sessid = (String) sess.getAttribute("temp_id");
+		//sess.getAttribute("temp_invoice_id");
+		
+		System.err.println("Temp invoice id is ->> "+sessid);
+		
+		
 //		Long 	prod_id 	= teinv.getProduct().getPid();
 //		
 //		Float   unit_price=0.0f;
@@ -464,8 +544,8 @@ public class InvoiceController {
 //		teinv.setTotal(sub_tot+cgst+sgst+igst);
 //		
 //		tempinserv.saveTempInvoice(teinv);
-//		
-//		return "redirect:/addinvoice";
-//	}
+		
+		return "redirect:/viewinvoices";
+	}
 	
 }
