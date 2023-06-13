@@ -1,11 +1,15 @@
 package com.example.demo.controller;
 
+import java.io.IOException;
 import java.sql.Date;
+import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.demo.exporttoexcel.ExportToExcel;
 import com.example.demo.model.Customer;
 import com.example.demo.model.Invoice;
 import com.example.demo.model.Invoice_Product;
@@ -401,11 +406,9 @@ public class InvoiceController {
 		}
 		
 		finaltotal = subtotalsum+totstgst+totctgst;
-		
 		int ftotalval = 0;
 		
 		ftotalval = Math.round(finaltotal);
-		
 		
 	 	model.addAttribute("invoice", invoice);
 	 	model.addAttribute("invprodlist", invprodlist);
@@ -445,13 +448,10 @@ public class InvoiceController {
 			if(newtmpid > 0)
 			{
 				tilist = tempinvserv.getAllTempInvoicesByTempInvoiceId(newtmpid); 
-
 				model.addAttribute("plist",   plist);
 				model.addAttribute("clist",   clist);
 				model.addAttribute("tilist",  tilist);
 				model.addAttribute("invoice", invoice);
-				
-				
 				return "EditInvoice";
 			}
 			else
@@ -545,7 +545,29 @@ public class InvoiceController {
 //		
 //		tempinserv.saveTempInvoice(teinv);
 		
-		return "redirect:/viewinvoices";
+		return "redirect:/editinvoice ";
+	}
+	
+	@GetMapping("/exportinvoice")
+	public void exoprtInvoiceToExcel(HttpServletResponse hres) throws IOException
+	{
+	
+			hres.setContentType("application/octet-stream");
+	        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
+	        
+	        LocalDate tday = LocalDate.now();
+	     
+	        String currentDateTime = dateFormatter.format( java.sql.Date.valueOf(tday));
+	         
+	        String headerKey = "Content-Disposition";
+	        String headerValue = "attachment; filename=users_" + currentDateTime + ".xlsx";
+	        hres.setHeader(headerKey, headerValue);
+	         
+	        List<Invoice> listInvoices = invserv.getAllInvoices();	
+	         
+	        ExportToExcel excelExporter = new ExportToExcel(listInvoices);
+	         
+	        excelExporter.export(hres);    
 	}
 	
 }
