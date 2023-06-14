@@ -1,6 +1,7 @@
 package com.example.demo.exporttoexcel;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.util.List;
 
 import javax.servlet.ServletOutputStream;
@@ -39,7 +40,7 @@ public class ExportToExcel {
 		
 		XSSFFont font = workbook.createFont();
 		font.setBold(true);
-		font.setFontHeight(16);
+		font.setFontHeight(12);
 		
 		style.setFont(font);
 		
@@ -47,7 +48,7 @@ public class ExportToExcel {
         createCell(row, 1, "Invoice No", style);       
         createCell(row, 2, "Date", style);    
         createCell(row, 3, "Total", style);
-        createCell(row, 4, "Customer Id", style);
+        createCell(row, 4, "Customer", style);
 		
 	}
 	
@@ -61,13 +62,22 @@ public class ExportToExcel {
 		     cell.setCellValue((Integer) value);
 		    } else if (value instanceof Boolean) {
 		        cell.setCellValue((Boolean) value);
+		    }
+		    else if (value instanceof Long) {
+		        cell.setCellValue((Long) value);
+		    }
+		    else if (value instanceof Date) {
+		        cell.setCellValue((Date) value);
+		    }
+		    else if (value instanceof Float) {
+		        cell.setCellValue((Float) value);
 		    }else {
 		        cell.setCellValue((String) value);
 		    }
 		    cell.setCellStyle(style);
 	
 	}
-	 private void writeDataLines() {
+	private void writeDataLines() {
 	        int rowCount = 1;
 	 
 	        CellStyle style = workbook.createCellStyle();
@@ -78,12 +88,14 @@ public class ExportToExcel {
 	        for (Invoice invoice : listInvoices) {
 	            Row row = sheet.createRow(rowCount++);
 	            int columnCount = 0;
-	             
+	            
+	            String date_add = ""+invoice.getDate_added(); 
+	             System.err.println("\n Date added ->> "+invoice.getDate_added()+"\n");
 	            createCell(row, columnCount++, invoice.getInvoice_id() , style);
 	            createCell(row, columnCount++, invoice.getInvoice_no() , style);
-	            createCell(row, columnCount++, invoice.getDate_added() , style);
+	            createCell(row, columnCount++, date_add , style);
 	            createCell(row, columnCount++, invoice.getTotal_amount() , style);
-	            createCell(row, columnCount++, invoice.getCustomer_id() , style);
+	            createCell(row, columnCount++, invoice.getCustomer().getCust_id() , style);
 	             
 	        }
 	    }

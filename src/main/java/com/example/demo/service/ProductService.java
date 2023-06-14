@@ -15,4 +15,5 @@ public interface ProductService {
 	
 	public int updateProduct(Product prod);
 	
+	public List<Product> getproductsbyInvoiceId(Long invid);
 }

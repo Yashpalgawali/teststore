@@ -551,7 +551,6 @@ public class InvoiceController {
 	@GetMapping("/exportinvoice")
 	public void exoprtInvoiceToExcel(HttpServletResponse hres) throws IOException
 	{
-	
 			hres.setContentType("application/octet-stream");
 	        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
 	        
@@ -559,12 +558,12 @@ public class InvoiceController {
 	     
 	        String currentDateTime = dateFormatter.format( java.sql.Date.valueOf(tday));
 	         
-	        String headerKey = "Content-Disposition";
-	        String headerValue = "attachment; filename=users_" + currentDateTime + ".xlsx";
+	        String headerKey = "Content-Disposition"; 
+	        String headerValue = "attachment; filename=Invoice_" + currentDateTime + ".xls";
 	        hres.setHeader(headerKey, headerValue);
 	         
 	        List<Invoice> listInvoices = invserv.getAllInvoices();	
-	         
+	        
 	        ExportToExcel excelExporter = new ExportToExcel(listInvoices);
 	         
 	        excelExporter.export(hres);    

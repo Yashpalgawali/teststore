@@ -14,4 +14,5 @@ public boolean isSaveProduct(Product prod);
 	
 	public int updateProduct(Product prod);
 	
+	public List<Product> getproductsbyInvoiceId(Long invid);
 }

@@ -47,4 +47,10 @@ public class ProductServImpl implements ProductService {
 		return prodrepo.updateProduct(prod);
 	}
 
+	@Override
+	public List<Product> getproductsbyInvoiceId(Long invid) {
+		// TODO Auto-generated method stub
+		return prodrepo.getproductsbyInvoiceId(invid);
+	}
+
 }

@@ -29,7 +29,16 @@ public class InvoiceServImpl implements InvoiceService {
 	@Override
 	public List<Invoice> getAllInvoices() {
 		// TODO Auto-generated method stub
-		return invrepo.getAllInvoices();
+		List<Invoice> invlist = invrepo.getAllInvoices();
+		
+		System.err.println("\n Inside getallinvoice service\n");
+		
+		for(int i=0;i<invlist.size();i++)
+		{
+			System.err.println(invlist.get(i));
+		}
+		//invlist.stream().forEach(e->System.err.println(e));
+		return invlist;
 	}
 
 	@Override

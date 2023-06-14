@@ -141,4 +141,31 @@ public class ProdRepoImpl implements ProductRepository {
 		return res;
 	}
 
+	@Override
+	public List<Product> getproductsbyInvoiceId(Long invid) {
+		// TODO Auto-generated method stub
+		return temp.query("select tbl_product.* from tbl_invoice JOIN tbl_invoice_product ON tbl_invoice_product.order_id=tbl_invoice.order_id JOIN tbl_product ON tbl_product.prod_id=tbl_invoice_product.prod_id where tbl_invoice.invoice_id="+invid, new RowMapper<Product>() {
+
+			@Override
+			public Product mapRow(ResultSet rs, int rowNum) throws SQLException {
+				// TODO Auto-generated method stub
+				
+				Product prod = new Product();
+				prod.setProd_id(rs.getLong(1));
+				prod.setProd_name(rs.getString(2));
+				prod.setProd_hsn(rs.getLong(3));
+				prod.setProd_model_no(rs.getString(4));
+				prod.setProd_unit(rs.getString(5));
+				prod.setProd_price(rs.getFloat(6));
+				prod.setGsttax(rs.getFloat(7));
+				prod.setCgst_per(rs.getFloat(8));
+				prod.setSgst_per(rs.getFloat(9));
+				prod.setIgst_per(10);
+				
+				return prod;
+			}
+			
+		});
+	}
+
 }
